@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
 
-LLVM_VERSION ?=
+LLVM_VERSION ?= -7 #update with correct LLVM / clang version
 LLVM := $(shell clang$(LLVM_VERSION) --version)
 CLANG_FLAGS ?= -W -Wall \
 	-Wno-compare-distinct-pointer-types
@@ -9,7 +9,7 @@ SRCS=$(wildcard *.c)
 OBJS=$(patsubst %.c,%.o,$(SRCS))
 Q ?= @
 
-INCLUDE_DIRS ?= -I../headers/
+INCLUDE_DIRS ?= -Iheaders/
 
 %.o: %.c
 	@echo "\tLLVM CC $@"
