@@ -1,16 +1,16 @@
 - To compile LKM/Netfilter example:
 
-    $ make
+      $ make
 
 - To load LKM/Netfilter example:
 
-    $ sudo insmod simplePacketFilter.ko
+      $ sudo insmod simplePacketFilter.ko
 
 - To list filter messages (status):
 
-    $ dmesg
+      $ dmesg
 
 - To unload LKM/Netfilter example:
 
-    $ sudo rmmod simplePacketFilter
+      $ sudo rmmod simplePacketFilter
 
