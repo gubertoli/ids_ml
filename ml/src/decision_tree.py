@@ -14,8 +14,8 @@ def dataset_header_features_only(path):
 def main():
 	# create a Pandas Dataframe with Training Dataset
 	pd_train = dataset_header_features_only('probe_attack_known_train.arff')
-	pd_train.append(dataset_header_features_only('probe_known_service_content_train.arff'))
-	pd_train.append(dataset_header_features_only('probe_known_service_train.arff'))
+	#pd_train.append(dataset_header_features_only('probe_known_service_content_train.arff'))
+	#pd_train.append(dataset_header_features_only('probe_known_service_train.arff'))
 	d = {'attack': 1, 'normal': 0}
 	pd_train['class@{normal,attack}'] = pd_train['class@{normal,attack}'].map(d)
 	X = pd_train[list(pd_train.columns[:len(pd_train.columns)-1])]
@@ -24,8 +24,8 @@ def main():
 	
 	# create a Pandas Dataframe with Validation Dataset
 	pd_validation = dataset_header_features_only('probe_attack_known_validation.arff')
-	pd_validation.append(dataset_header_features_only('probe_known_service_content_test.arff'))
-	pd_validation.append(dataset_header_features_only('probe_known_service_test.arff'))
+	#pd_validation.append(dataset_header_features_only('probe_known_service_content_test.arff'))
+	#pd_validation.append(dataset_header_features_only('probe_known_service_test.arff'))
 	pd_validation['class@{normal,attack}'] = pd_validation['class@{normal,attack}'].map(d)
 	X_test = pd_validation[list(pd_validation.columns[:len(pd_validation.columns)-1])]
 	Y_test = pd_validation['class@{normal,attack}']
