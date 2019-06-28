@@ -1,7 +1,9 @@
 from arff2pandas import a2p
+from sklearn import tree
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, classification_report
 import pandas as pd
+import pydotplus
 
 # considering dataset, this def just return header-based features plus class
 def dataset_header_features_only(path):
@@ -38,6 +40,9 @@ def main():
 
 	try:
 		Y_prediction = clf.predict(X_test)
+		dot_data = tree.export_graphviz(clf, out_file=None, feature_names=list(pd_validation.columns[:len(pd_validation.columns)-1]),class_names=['normal','attack'])
+		graph = pydotplus.graph_from_dot_data(dot_data)
+		graph.write_png("full_ids_dt.png")
 	except ValueError as e:
 		print(e)
 
