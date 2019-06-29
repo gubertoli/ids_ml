@@ -20,7 +20,8 @@ def main():
 	#pd_train.append(dataset_header_features_only('probe_known_service_train.arff'))
 	d = {'attack': 1, 'normal': 0}
 	pd_train['class@{normal,attack}'] = pd_train['class@{normal,attack}'].map(d)
-	X = pd_train[list(pd_train.columns[:len(pd_train.columns)-1])]
+	X = pd_train[list(pd_train.columns[:len(pd_train.columns)-2])]
+	print(list(pd_train.columns[:len(pd_train.columns)-2]))
 	Y = pd_train['class@{normal,attack}']
 	
 	
@@ -29,7 +30,7 @@ def main():
 	#pd_validation.append(dataset_header_features_only('probe_known_service_content_test.arff'))
 	#pd_validation.append(dataset_header_features_only('probe_known_service_test.arff'))
 	pd_validation['class@{normal,attack}'] = pd_validation['class@{normal,attack}'].map(d)
-	X_test = pd_validation[list(pd_validation.columns[:len(pd_validation.columns)-1])]
+	X_test = pd_validation[list(pd_validation.columns[:len(pd_validation.columns)-2])]
 	Y_test = pd_validation['class@{normal,attack}']
 
 	clf = DecisionTreeClassifier()
@@ -40,7 +41,7 @@ def main():
 
 	try:
 		Y_prediction = clf.predict(X_test)
-		dot_data = tree.export_graphviz(clf, out_file=None, feature_names=list(pd_validation.columns[:len(pd_validation.columns)-1]),class_names=['normal','attack'])
+		dot_data = tree.export_graphviz(clf, out_file=None, feature_names=list(pd_validation.columns[:len(pd_validation.columns)-2]),class_names=['normal','attack'])
 		graph = pydotplus.graph_from_dot_data(dot_data)
 		graph.write_png("full_ids_dt.png")
 	except ValueError as e:
