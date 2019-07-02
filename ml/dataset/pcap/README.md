@@ -7,7 +7,13 @@ editcap -c 3000000 probe_known_attacks.pcap new_files.pcap
 ```
 ## Extracting headers (pcap -> tsv)
 ```
-tshark -r probe_known_attacks.pcap -T fields -e ip.src -e ip.dst -e ip.opt.type -e ip.len -e ip.id -e ip.frag_offset -e ip.flags.rb -e ip.flags.df -e ip.flags.mf -e ip.proto -e ip.checksum -e udp.srcport -e udp.dstport -e udp.length -e udp.checksum -e icmp.type -e icmp.code -e icmp.checksum -e tcp.len -e tcp.srcport -e tcp.dstport -e tcp.seq -e tcp.ack -e tcp.flags.fin -e tcp.flags.syn -e tcp.flags.reset -e tcp.flags.push -e tcp.flags.ack -e tcp.flags.urg -e eth.len -E separator=/t -E header=y > pcap_to_csv.tsv
+tshark -r probe_known_attacks.pcap -T fields -e ip.src -e ip.dst -e ip.opt.type -e ip.len -e ip.id 
+  -e ip.frag_offset -e ip.flags.rb -e ip.flags.df -e ip.flags.mf -e ip.proto 
+  -e ip.checksum -e udp.srcport -e udp.dstport -e udp.length -e udp.checksum 
+  -e icmp.type -e icmp.code -e icmp.checksum -e tcp.len -e tcp.srcport 
+  -e tcp.dstport -e tcp.seq -e tcp.ack -e tcp.flags.fin -e tcp.flags.syn 
+  -e tcp.flags.reset -e tcp.flags.push -e tcp.flags.ack -e tcp.flags.urg 
+  -e eth.len -E separator=/t -E header=y > pcap_to_csv.tsv
 ```
 
 ## Wireshark filters to identify nmap scan 
