@@ -23,6 +23,8 @@ static __always_inline int process_packet(struct xdp_md *ctx, __u64 off){
 	void *data = (void *)(long)ctx->data;
 	struct iphdr *iph;
 	struct tcphdr *tcp;
+	struct udphdr *udp;
+
 	__u16 payload_len;
 	__u8 protocol;
 
@@ -44,7 +46,14 @@ static __always_inline int process_packet(struct xdp_md *ctx, __u64 off){
 		tcp = data + off;
 		if(tcp + 1 > data_end)
 			return XDP_PASS;
-
+		/*
+		    struct tcphdr <linux/tcp.h>
+			__u16 source
+			__u16 dest
+			__u32 seq
+			__u32 ack_seq
+			__u16 fin, syn, rst, psh, ack, urg, ece, cwr
+		*/
 		/* Drop if using port PORT_DROP */
 		if(tcp->source == bpf_htons(PORT_DROP) || tcp->dest == bpf_htons(PORT_DROP))
 			return XDP_DROP;
@@ -52,6 +61,15 @@ static __always_inline int process_packet(struct xdp_md *ctx, __u64 off){
 			return XDP_PASS;
 
 	} else if (protocol == IPPROTO_UDP) {
+		/*
+		    struct udphdr <linux/udp.h>
+			__u16 source
+			__u16 dest
+			__u16 len
+			__u16 check
+		*/
+
+		udp = data + off;
 		return XDP_PASS;
 	}
 
@@ -73,7 +91,7 @@ int pfilter(struct xdp_md *ctx){
 		return XDP_PASS;
 	eth_proto = eth->h_proto;
 
-	/* demo program only accepts ipv4 packets */
+	/* only accepts ipv4 packets for processing */
 	if (eth_proto == bpf_htons(ETH_P_IP))
 		return process_packet(ctx, nh_off);
 	else
