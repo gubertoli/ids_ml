@@ -49,32 +49,32 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
 			____ ____ __X_ = Syn
 			____ ____ ___X = Fin
 	*/
-	if (tcph->window == htons(1024) || tcph->window == htons(2048) || 
-tcph->window == htons(3072) || tcph->window == htons(4096)){
+	if (tcph->window == htons(1024) || tcph->window == htons(2048) || tcph->window == htons(3072) || tcph->window == htons(4096)){
 	    if (tcph->fin == 1 && tcph->psh == 1 && tcph->urg == 1){
-		    // XMAS SCAN
-		    return NF_DROP;
-	    } else if (tcph->fin == 1 && tcph->cwr == 0 && tcph->ece == 0 && 
-tcph->urg == 0 && tcph->ack == 0 && tcph->psh == 0 && tcph->rst==0 &&
-tcph->syn==0) {
-		// FIN SCAN
+		// XMAS SCAN
+		printk(KERN_INFO "TCP XMAS Scan blocked\n");
 		return NF_DROP;
-	    } else if (tcph->fin == 0 && tcph->cwr == 0 && tcph->ece == 0 && 
-tcph->urg == 0 && tcph->ack == 0 && tcph->psh == 0 && tcph->rst==0 &&
-tcph->syn==0) {
+	    } else if (tcph->fin == 1 && tcph->cwr == 0 && tcph->ece == 0 && tcph->urg == 0 && tcph->ack == 0 && tcph->psh == 0 && tcph->rst==0 && tcph->syn==0) {
+		// FIN SCAN
+		printk(KERN_INFO "TCP FIN Scan blocked\n");
+		return NF_DROP;
+	    } else if (tcph->fin == 0 && tcph->cwr == 0 && tcph->ece == 0 && tcph->urg == 0 && tcph->ack == 0 && tcph->psh == 0 && tcph->rst==0 && tcph->syn==0) {
 		// NULL SCAN
+		printk(KERN_INFO "TCP NULL Scan blocked\n");
 		return NF_DROP;
 	    } else if (tcph->fin == 1){
 		// SYN SCAN
+		printk(KERN_INFO "TCP SYN Scan blocked\n");
 		return NF_DROP;
 	    }
+	} else {
+	    return NF_ACCEPT;
 	}
     } else if (iph->protocol == IPPROTO_UDP) { // UDP Protocol
 	udph = udp_hdr(skb);
 	return NF_ACCEPT;
-    } else {
-	return NF_ACCEPT;
-    }
+    } 
+    return NF_ACCEPT;
 }
 
 // Netfilter hook
