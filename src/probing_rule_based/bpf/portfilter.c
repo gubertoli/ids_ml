@@ -14,9 +14,6 @@
 /* 0x3FFF mask to check for fragment offset field */
 #define IP_FRAGMENTED 65343
 
-/* Port number to be dropped */
-#define PORT_DROP 80
-
 static __always_inline int process_packet(struct xdp_md *ctx, __u64 off){
 
 	void *data_end = (void *)(long)ctx->data_end;
@@ -54,11 +51,30 @@ static __always_inline int process_packet(struct xdp_md *ctx, __u64 off){
 			__u32 ack_seq
 			__u16 fin, syn, rst, psh, ack, urg, ece, cwr
 		*/
-		/* Drop if using port PORT_DROP */
-		if(tcp->source == bpf_htons(PORT_DROP) || tcp->dest == bpf_htons(PORT_DROP))
-			return XDP_DROP;
-		else
-			return XDP_PASS;
+		
+		//if(tcp->source == bpf_htons(PORT_DROP) || tcp->dest == bpf_htons(PORT_DROP))
+		//	return XDP_DROP;
+		//else
+		//	return XDP_PASS;
+
+
+		if (tcp->window == bpf_htons(1024) || tcp->window == bpf_htons(2048) || tcp->window == bpf_htons(3072) || tcp->window == bpf_htons(4096)){
+	    		if (tcp->fin == 1 && tcp->psh == 1 && tcp->urg == 1){
+				// XMAS SCAN
+				return XDP_DROP;
+			} else if (tcp->fin == 1 && tcp->cwr == 0 && tcp->ece == 0 && tcp->urg == 0 && tcp->ack == 0 && tcp->psh == 0 && tcp->rst==0 && tcp->syn==0) {
+				// FIN SCAN
+				return XDP_DROP;
+			} else if (tcp->fin == 0 && tcp->cwr == 0 && tcp->ece == 0 && tcp->urg == 0 && tcp->ack == 0 && tcp->psh == 0 && tcp->rst==0 && tcp->syn==0) {
+				// NULL SCAN
+				return XDP_DROP;
+		    	} else if (tcph->fin == 1){
+				// SYN SCAN
+				return XDP_DROP;
+			}
+		} else {
+	    		return XDP_PASS;
+		}
 
 	} else if (protocol == IPPROTO_UDP) {
 		/*
