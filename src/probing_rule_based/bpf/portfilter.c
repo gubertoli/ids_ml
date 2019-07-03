@@ -68,7 +68,7 @@ static __always_inline int process_packet(struct xdp_md *ctx, __u64 off){
 			} else if (tcp->fin == 0 && tcp->cwr == 0 && tcp->ece == 0 && tcp->urg == 0 && tcp->ack == 0 && tcp->psh == 0 && tcp->rst==0 && tcp->syn==0) {
 				// NULL SCAN
 				return XDP_DROP;
-		    	} else if (tcph->fin == 1){
+		    	} else if (tcp->fin == 1){
 				// SYN SCAN
 				return XDP_DROP;
 			}
