@@ -26,54 +26,92 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
     struct ethhdr *ethh;
     struct iphdr  *iph; 	// ip header struct
     struct tcphdr *tcph;	// tcp header struct
-    struct udphdr *udph;	// udp header struct
-
+    
     ethh = eth_hdr(skb);
     iph = ip_hdr(skb);
 
     if (!(iph)){
-	return NF_ACCEPT;
+		return NF_ACCEPT;
     }
 
     if (iph->protocol == IPPROTO_TCP){ // TCP Protocol
 	tcph = tcp_hdr(skb);
-	// rule-based probing block
-	/* tcp flags =  XXX_ ____ ____ = Reserved
-			___X ____ ____ = Nonce
-			____ X___ ____ = CWR - Congestion Window Reduced
-			____ _X__ ____ = ECN-Echo
-			____ __X_ ____ = Urgent
-			____ ___X ____ = Acknowledgment
-			____ ____ X___ = Push
-			____ ____ _X__ = Reset
-			____ ____ __X_ = Syn
-			____ ____ ___X = Fin
-	*/
-	if (tcph->window == htons(1024) || tcph->window == htons(2048) || tcph->window == htons(3072) || tcph->window == htons(4096)){
-	    if (tcph->fin == 1 && tcph->psh == 1 && tcph->urg == 1){
-		// XMAS SCAN
-		printk(KERN_INFO "TCP XMAS Scan blocked\n");
-		return NF_DROP;
-	    } else if (tcph->fin == 1 && tcph->cwr == 0 && tcph->ece == 0 && tcph->urg == 0 && tcph->ack == 0 && tcph->psh == 0 && tcph->rst==0 && tcph->syn==0) {
-		// FIN SCAN
-		printk(KERN_INFO "TCP FIN Scan blocked\n");
-		return NF_DROP;
-	    } else if (tcph->fin == 0 && tcph->cwr == 0 && tcph->ece == 0 && tcph->urg == 0 && tcph->ack == 0 && tcph->psh == 0 && tcph->rst==0 && tcph->syn==0) {
-		// NULL SCAN
-		printk(KERN_INFO "TCP NULL Scan blocked\n");
-		return NF_DROP;
-	    } else if (tcph->fin == 1){
-		// SYN SCAN
-		printk(KERN_INFO "TCP SYN Scan blocked\n");
-		return NF_DROP;
+	
+
+	# to obtain mss_val
+	# https://stackoverflow.com/questions/42750552/read-tcp-options-fields
+
+	uint8_t *p = (uint8_t *)tcp + 20; // or sizeof (struct tcphdr)
+	uint8_t *end = (uint8_t *)tcp + tcp->doff * 4;
+	uint16_t mss = 0; 
+	while (p < end) {
+	    uint8_t kind = *p++;
+	    if (kind == 0) {
+	        break;
+	    }
+	    if (kind == 1) {
+	        // No-op option with no length.
+	        continue;
+	    }
+	    uint8_t size = *p++;
+	    if (kind == 2) {
+	        mss = ntohs(*(uint16_t *)p);
+	    }
+	    p += (size - 2);
+	}
+
+
+	if (tcph->ack_seq < 284597952.0) {
+	    if (tcph->urg == 0) {
+	        if (tcph->cwr == 0) {
+	            if (mss < 1175.5) {
+	                return NF_ACCEPT;
+	            } else {
+	            	printk(KERN_INFO "Packet drop (1)\n");
+	                return NF_DROP;
+	            }
+	        } else {
+	            if (tcph->ack_seq < 7806425.5) {
+	                return NF_ACCEPT;
+	            } else {
+	            	printk(KERN_INFO "Packet drop (2)\n");
+	                return NF_DROP;
+	            }
+	        }
+	    } else {
+	    	printk(KERN_INFO "Packet drop (3)\n");
+	        return NF_DROP;
+	    }
+	} else {
+	    // IP_DF = 0x4000
+	    if ((iph->frag_off & IP_DF) == 0) {
+	        if (iph->len < 41.0) {
+	            if (tcph->rst == 0) {
+	            	printk(KERN_INFO "Packet drop (4)\n");
+	                return NF_DROP;
+	            } else {
+	                return NF_ACCEPT;
+	            }
+	        } else {
+	            return NF_ACCEPT;
+	        }
+	    } else {
+	        if (iph->ttl < 76.0) {
+	            if (iph->ttl < 63.0) {
+	                return NF_ACCEPT;
+	            } else {
+	            	printk(KERN_INFO "Packet drop (5)\n");
+	                return NF_DROP;
+	            }
+	        } else {
+	            return NF_ACCEPT;
+	        }
 	    }
 	} else {
 	    return NF_ACCEPT;
 	}
-    } else if (iph->protocol == IPPROTO_UDP) { // UDP Protocol
-	udph = udp_hdr(skb);
-	return NF_ACCEPT;
-    } 
+    
+
     return NF_ACCEPT;
 }
 
