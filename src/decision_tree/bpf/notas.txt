@@ -1,0 +1,4 @@
+$ make
+$ sudo ip -force link set dev [INTERFACE] xdp obj portfilter.o sec filter
+$ ip link show [INTERFACE]
+$ sudo ip link set dev [INTERFACE] xdp off
