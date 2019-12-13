@@ -34,83 +34,84 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
 		return NF_ACCEPT;
     }
 
-    if (iph->protocol == IPPROTO_TCP){ // TCP Protocol
-	tcph = tcp_hdr(skb);
+    if (iph->protocol == IPPROTO_TCP) { // TCP Protocol
+		tcph = tcp_hdr(skb);
 	
 
-	// to obtain mss_val
-	// https://stackoverflow.com/questions/42750552/read-tcp-options-fields
+		// to obtain mss_val
+		// https://stackoverflow.com/questions/42750552/read-tcp-options-fields
 
-	uint8_t *p = (uint8_t *)tcph + 20; // or sizeof (struct tcphdr)
-	uint8_t *end = (uint8_t *)tcph + tcph->doff * 4;
-	uint16_t mss = 0; 
-	while (p < end) {
-	    uint8_t kind = *p++;
-	    if (kind == 0) {
-	        break;
-	    }
-	    if (kind == 1) {
-	        // No-op option with no length.
-	        continue;
-	    }
-	    uint8_t size = *p++;
-	    if (kind == 2) {
-	        mss = ntohs(*(uint16_t *)p);
-	    }
-	    p += (size - 2);
-	}
+		uint8_t *p = (uint8_t *)tcph + 20; // or sizeof (struct tcphdr)
+		uint8_t *end = (uint8_t *)tcph + tcph->doff * 4;
+		uint16_t mss = 0; 
+		while (p < end) {
+		    uint8_t kind = *p++;
+		    if (kind == 0) {
+		        break;
+		    }
+		    if (kind == 1) {
+		        // No-op option with no length.
+		        continue;
+		    }
+		    uint8_t size = *p++;
+		    if (kind == 2) {
+		        mss = ntohs(*(uint16_t *)p);
+		    }
+		    p += (size - 2);
+		}
 
 
-	if (tcph->ack_seq < 284597952.0) {
-	    if (tcph->urg == 0) {
-	        if (tcph->cwr == 0) {
-	            if (mss < 1175.5) {
-	                return NF_ACCEPT;
-	            } else {
-	            	printk(KERN_INFO "Packet drop (1)\n");
-	                return NF_DROP;
-	            }
-	        } else {
-	            if (tcph->ack_seq < 7806425.5) {
-	                return NF_ACCEPT;
-	            } else {
-	            	printk(KERN_INFO "Packet drop (2)\n");
-	                return NF_DROP;
-	            }
-	        }
-	    } else {
-	    	printk(KERN_INFO "Packet drop (3)\n");
-	        return NF_DROP;
-	    }
-	} else {
-	    // IP_DF = 0x4000
-	    if ((iph->frag_off & 0x4000) == 0) {
-	        if (iph->tot_len < 41.0) {
-	            if (tcph->rst == 0) {
-	            	printk(KERN_INFO "Packet drop (4)\n");
-	                return NF_DROP;
-	            } else {
-	                return NF_ACCEPT;
-	            }
-	        } else {
-	            return NF_ACCEPT;
-	        }
-	    } else {
-	        if (iph->ttl < 76.0) {
-	            if (iph->ttl < 63.0) {
-	                return NF_ACCEPT;
-	            } else {
-	            	printk(KERN_INFO "Packet drop (5)\n");
-	                return NF_DROP;
-	            }
-	        } else {
-	            return NF_ACCEPT;
-	        }
-	    }
-	} 
-    
+		if (tcph->ack_seq < 284597952.0) {
+		    if (tcph->urg == 0) {
+		        if (tcph->cwr == 0) {
+		            if (mss < 1175.5) {
+		                return NF_ACCEPT;
+		            } else {
+		            	printk(KERN_INFO "Packet drop (1)\n");
+		                return NF_DROP;
+		            }
+		        } else {
+		            if (tcph->ack_seq < 7806425.5) {
+		                return NF_ACCEPT;
+		            } else {
+		            	printk(KERN_INFO "Packet drop (2)\n");
+		                return NF_DROP;
+		            }
+		        }
+		    } else {
+		    	printk(KERN_INFO "Packet drop (3)\n");
+		        return NF_DROP;
+		    }
+		} else {
+		    // IP_DF = 0x4000
+		    if ((iph->frag_off & 0x4000) == 0) {
+		        if (iph->tot_len < 41.0) {
+		            if (tcph->rst == 0) {
+		            	printk(KERN_INFO "Packet drop (4)\n");
+		                return NF_DROP;
+		            } else {
+		                return NF_ACCEPT;
+		            }
+		        } else {
+		            return NF_ACCEPT;
+		        }
+		    } else {
+		        if (iph->ttl < 76.0) {
+		            if (iph->ttl < 63.0) {
+		                return NF_ACCEPT;
+		            } else {
+		            	printk(KERN_INFO "Packet drop (5)\n");
+		                return NF_DROP;
+		            }
+		        } else {
+		            return NF_ACCEPT;
+		        }
+		    }
+		} 
+	    
 
-    return NF_ACCEPT;
+	    return NF_ACCEPT;
+}
 }
 
 // Netfilter hook
@@ -150,3 +151,5 @@ void removeFilter(void){
 
 module_init(setUpFilter);
 module_exit(removeFilter);
+
+MODULE_LICENSE("GPL");
