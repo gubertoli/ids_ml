@@ -58,36 +58,75 @@ static __always_inline int process_packet(struct xdp_md *ctx, __u64 off){
 		//	return XDP_PASS;
 
 
-		if (tcp->window == bpf_htons(1024) || tcp->window == bpf_htons(2048) || tcp->window == bpf_htons(3072) || tcp->window == bpf_htons(4096)){
-	    		if (tcp->fin == 1 && tcp->psh == 1 && tcp->urg == 1){
-				// XMAS SCAN
-				return XDP_DROP;
-			} else if (tcp->fin == 1 && tcp->cwr == 0 && tcp->ece == 0 && tcp->urg == 0 && tcp->ack == 0 && tcp->psh == 0 && tcp->rst==0 && tcp->syn==0) {
-				// FIN SCAN
-				return XDP_DROP;
-			} else if (tcp->fin == 0 && tcp->cwr == 0 && tcp->ece == 0 && tcp->urg == 0 && tcp->ack == 0 && tcp->psh == 0 && tcp->rst==0 && tcp->syn==0) {
-				// NULL SCAN
-				return XDP_DROP;
-		    	} else if (tcp->fin == 1){
-				// SYN SCAN
-				return XDP_DROP;
-			}
-		} else {
-	    		return XDP_PASS;
+		tcph = tcp_hdr(skb);
+	
+
+		// to obtain mss_val
+		// https://stackoverflow.com/questions/42750552/read-tcp-options-fields
+
+		uint8_t *p = (uint8_t *)tcph + 20; // or sizeof (struct tcphdr)
+		uint8_t *end = (uint8_t *)tcph + tcph->doff * 4;
+		uint16_t mss = 0; 
+		while (p < end) {
+		    uint8_t kind = *p++;
+		    if (kind == 0) {
+		        break;
+		    }
+		    if (kind == 1) {
+		        // No-op option with no length.
+		        continue;
+		    }
+		    uint8_t size = *p++;
+		    if (kind == 2) {
+		        mss = ntohs(*(uint16_t *)p);
+		    }
+		    p += (size - 2);
 		}
 
-	} else if (protocol == IPPROTO_UDP) {
-		/*
-		    struct udphdr <linux/udp.h>
-			__u16 source
-			__u16 dest
-			__u16 len
-			__u16 check
-		*/
 
-		udp = data + off;
-		return XDP_PASS;
-	}
+		if (tcph->ack_seq < 284597952.0) {
+		    if (tcph->urg == 0) {
+		        if (tcph->cwr == 0) {
+		            if (mss < 1175.5) {
+		                return XDP_PASS;
+		            } else {
+		            	return XDP_DROP;
+		            }
+		        } else {
+		            if (tcph->ack_seq < 7806425.5) {
+		                return XDP_PASS;
+		            } else {
+		            	return XDP_DROP;
+		            }
+		        }
+		    } else {
+		    	return XDP_DROP;
+		    }
+		} else {
+		    // IP_DF = 0x4000
+		    if ((iph->frag_off & 0x4000) == 0) {
+		        if (iph->tot_len < 41.0) {
+		            if (tcph->rst == 0) {
+		            	return XDP_DROP;
+		            } else {
+		                return XDP_PASS;
+		            }
+		        } else {
+		            return XDP_PASS;
+		        }
+		    } else {
+		        if (iph->ttl < 76.0) {
+		            if (iph->ttl < 63.0) {
+		                return XDP_PASS;
+		            } else {
+		            	return XDP_DROP;
+		            }
+		        } else {
+		            return XDP_PASS;
+		        }
+		    }
+		} 
+	    
 
 	return XDP_PASS;
 }
