@@ -69,16 +69,16 @@ static __always_inline int process_packet(struct xdp_md *ctx, __u64 off){
 		}
 
 
-		if (tcp->ack_seq < 284597952.0) {
+		if (tcp->ack_seq < bpf_htons(284597952)) {
 		    if (tcp->urg == 0) {
 		        if (tcp->cwr == 0) {
-		            if (mss < 1175.5) {
+		            if (mss < bpf_htons(1175.5)) {
 		                return XDP_PASS;
 		            } else {
 		            	return XDP_DROP;
 		            }
 		        } else {
-		            if (tcp->ack_seq < 7806425.5) {
+		            if (tcp->ack_seq < bpf_htons(7806425.5)) {
 		                return XDP_PASS;
 		            } else {
 		            	return XDP_DROP;
@@ -90,7 +90,7 @@ static __always_inline int process_packet(struct xdp_md *ctx, __u64 off){
 		} else {
 		    // IP_DF = 0x4000
 		    if ((iph->frag_off & 0x4000) == 0) {
-		        if (iph->tot_len < 41.0) {
+		        if (iph->tot_len < bpf_htons(41.0)) {
 		            if (tcp->rst == 0) {
 		            	return XDP_DROP;
 		            } else {
@@ -100,8 +100,8 @@ static __always_inline int process_packet(struct xdp_md *ctx, __u64 off){
 		            return XDP_PASS;
 		        }
 		    } else {
-		        if (iph->ttl < 76.0) {
-		            if (iph->ttl < 63.0) {
+		        if (iph->ttl < bpf_htons(76.0)) {
+		            if (iph->ttl < bpf_htons(63.0)) {
 		                return XDP_PASS;
 		            } else {
 		            	return XDP_DROP;
