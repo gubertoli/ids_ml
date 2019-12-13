@@ -38,8 +38,8 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
 	tcph = tcp_hdr(skb);
 	
 
-	# to obtain mss_val
-	# https://stackoverflow.com/questions/42750552/read-tcp-options-fields
+	// to obtain mss_val
+	// https://stackoverflow.com/questions/42750552/read-tcp-options-fields
 
 	uint8_t *p = (uint8_t *)tcp + 20; // or sizeof (struct tcphdr)
 	uint8_t *end = (uint8_t *)tcp + tcp->doff * 4;
