@@ -1,3 +1,4 @@
+#include <netinet/in.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -43,21 +44,7 @@ static __always_inline int process_packet(struct xdp_md *ctx, __u64 off){
 		tcp = data + off;
 		if(tcp + 1 > data_end)
 			return XDP_PASS;
-		/*
-		    struct tcphdr <linux/tcp.h>
-			__u16 source
-			__u16 dest
-			__u32 seq
-			__u32 ack_seq
-			__u16 fin, syn, rst, psh, ack, urg, ece, cwr
-		*/
-		
-		//if(tcp->source == bpf_htons(PORT_DROP) || tcp->dest == bpf_htons(PORT_DROP))
-		//	return XDP_DROP;
-		//else
-		//	return XDP_PASS;
-
-
+	
 		tcph = tcp_hdr(skb);
 	
 
