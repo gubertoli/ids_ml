@@ -41,8 +41,8 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
 	// to obtain mss_val
 	// https://stackoverflow.com/questions/42750552/read-tcp-options-fields
 
-	uint8_t *p = (uint8_t *)tcp + 20; // or sizeof (struct tcphdr)
-	uint8_t *end = (uint8_t *)tcp + tcp->doff * 4;
+	uint8_t *p = (uint8_t *)tcph + 20; // or sizeof (struct tcphdr)
+	uint8_t *end = (uint8_t *)tcph + tcph->doff * 4;
 	uint16_t mss = 0; 
 	while (p < end) {
 	    uint8_t kind = *p++;
@@ -84,7 +84,7 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
 	    }
 	} else {
 	    // IP_DF = 0x4000
-	    if ((iph->frag_off & IP_DF) == 0) {
+	    if ((iph->frag_off & 0x4000) == 0) {
 	        if (iph->len < 41.0) {
 	            if (tcph->rst == 0) {
 	            	printk(KERN_INFO "Packet drop (4)\n");
@@ -107,9 +107,7 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
 	            return NF_ACCEPT;
 	        }
 	    }
-	} else {
-	    return NF_ACCEPT;
-	}
+	} 
     
 
     return NF_ACCEPT;
