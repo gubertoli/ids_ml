@@ -85,7 +85,7 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
 	} else {
 	    // IP_DF = 0x4000
 	    if ((iph->frag_off & 0x4000) == 0) {
-	        if (iph->len < 41.0) {
+	        if (iph->tot_len < 41.0) {
 	            if (tcph->rst == 0) {
 	            	printk(KERN_INFO "Packet drop (4)\n");
 	                return NF_DROP;
