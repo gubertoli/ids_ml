@@ -132,7 +132,7 @@ int setUpFilter(void){
     #if LINUX_VERSION_CODE <= KERNEL_VERSION(4,12,14)
     	nf_register_hook(&simpleFilterHook);
     #else
-	nf_register_net_hook(&init_net, &simpleFilterHook);
+		nf_register_net_hook(&init_net, &simpleFilterHook);
     #endif
     return 0;
 }
@@ -150,5 +150,3 @@ void removeFilter(void){
 
 module_init(setUpFilter);
 module_exit(removeFilter);
-
-MODULE_LICENSE("GPL");
