@@ -45,14 +45,12 @@ static __always_inline int process_packet(struct xdp_md *ctx, __u64 off){
 		if(tcp + 1 > data_end)
 			return XDP_PASS;
 	
-		tcph = tcp_hdr(skb);
-	
-
+		
 		// to obtain mss_val
 		// https://stackoverflow.com/questions/42750552/read-tcp-options-fields
 
-		uint8_t *p = (uint8_t *)tcph + 20; // or sizeof (struct tcphdr)
-		uint8_t *end = (uint8_t *)tcph + tcph->doff * 4;
+		uint8_t *p = (uint8_t *)tcp + 20; // or sizeof (struct tcphdr)
+		uint8_t *end = (uint8_t *)tcp + tcp->doff * 4;
 		uint16_t mss = 0; 
 		while (p < end) {
 		    uint8_t kind = *p++;
@@ -71,16 +69,16 @@ static __always_inline int process_packet(struct xdp_md *ctx, __u64 off){
 		}
 
 
-		if (tcph->ack_seq < 284597952.0) {
-		    if (tcph->urg == 0) {
-		        if (tcph->cwr == 0) {
+		if (tcp->ack_seq < 284597952.0) {
+		    if (tcp->urg == 0) {
+		        if (tcp->cwr == 0) {
 		            if (mss < 1175.5) {
 		                return XDP_PASS;
 		            } else {
 		            	return XDP_DROP;
 		            }
 		        } else {
-		            if (tcph->ack_seq < 7806425.5) {
+		            if (tcp->ack_seq < 7806425.5) {
 		                return XDP_PASS;
 		            } else {
 		            	return XDP_DROP;
@@ -93,7 +91,7 @@ static __always_inline int process_packet(struct xdp_md *ctx, __u64 off){
 		    // IP_DF = 0x4000
 		    if ((iph->frag_off & 0x4000) == 0) {
 		        if (iph->tot_len < 41.0) {
-		            if (tcph->rst == 0) {
+		            if (tcp->rst == 0) {
 		            	return XDP_DROP;
 		            } else {
 		                return XDP_PASS;
