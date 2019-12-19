@@ -9,6 +9,8 @@
 #include <linux/tcp.h>
 #include <linux/udp.h>
 
+#define IP_DF 0x4000
+
 static struct nf_hook_ops simpleFilterHook;
 
 // implementation of Filter callback function - Netfilter Hook
@@ -26,8 +28,7 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
     struct ethhdr *ethh;
     struct iphdr  *iph; 	// ip header struct
     struct tcphdr *tcph;	// tcp header struct
-    struct udphdr *udph;	// udp header struct
-
+    
     ethh = eth_hdr(skb);
     iph = ip_hdr(skb);
 
@@ -37,17 +38,46 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
 
     if (iph->protocol == IPPROTO_TCP){ // TCP Protocol
 	tcph = tcp_hdr(skb);
+		
+	if (iph->tot_len <= htons(64)){  					// tot_len is u16
+		printk(KERN_INFO "Step 1\n");
+		if (iph->ttl < htons(65)){ 					// ttl is u8
+			printk(KERN_INFO "Step 2\n");
+			if (tcph->window <= htons(1024)){		// window is u16
+				printk(KERN_INFO "Step 3\n");
+				if ((iph->frag_off & IP_DF)  == 0){	// frag_off is u16
+					printk(KERN_INFO "Step 4 - DROP\n");
+					return NF_DROP;
+				} else {
+					printk(KERN_INFO "Step 5\n");
+					return NF_ACCEPT;
+				}
+			} else {
+				if (iph->ttl < htons(63.5)){
+					printk(KERN_INFO "Step 6\n");
+					return NF_ACCEPT;
+				} else {
+					printk(KERN_INFO "Step 7 - DROP\n");
+					return NF_DROP;
+				}
+			}
+		} else {
+			if (iph->ttl < htons(254.5)){
+				printk(KERN_INFO "Step 8\n");
+				return NF_ACCEPT;
+			} else {
+				printk(KERN_INFO "Step 9 - DROP\n");
+				return NF_DROP;
+			}
+		}
+	} else {
+		//printk(KERN_INFO "Step 10\n");
+		return NF_ACCEPT;
+	}
 	
-	//if (tcph->ack == 1) // TCP ACK Flag assigned
-
-	//match condition
-	//return NF_DROP;
-
-    } else if (iph->protocol == IPPROTO_UDP) { // UDP Protocol
-	udph = udp_hdr(skb);
-    } else {
-	return NF_ACCEPT;
     }
+
+    return NF_ACCEPT;
 }
 
 // Netfilter hook
