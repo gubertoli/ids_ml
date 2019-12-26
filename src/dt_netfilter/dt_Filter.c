@@ -38,43 +38,16 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
 
     if (iph->protocol == IPPROTO_TCP){ // TCP Protocol
 	tcph = tcp_hdr(skb);
+
+	if (iph->tot_len > htons(64)) return NF_ACCEPT;
+
+	if ((iph->ttl > htons(254))
+		|| (iph->ttl == htons(64) && tcph->window > htons(1024))
+		|| (iph->ttl <= htons(65) && tcph->window <= htons(1024) && ((iph->frag_off & IP_DF)==0)))
+		return NF_DROP;
+
+	return NF_ACCEPT;
 		
-	if (iph->tot_len <= htons(64)){  					// tot_len is u16
-		printk(KERN_INFO "Step 1\n");
-		if (iph->ttl < htons(65)){ 					// ttl is u8
-			printk(KERN_INFO "Step 2\n");
-			if (tcph->window <= htons(1024)){		// window is u16
-				printk(KERN_INFO "Step 3\n");
-				if ((iph->frag_off & IP_DF)  == 0){	// frag_off is u16
-					printk(KERN_INFO "Step 4 - DROP\n");
-					return NF_DROP;
-				} else {
-					printk(KERN_INFO "Step 5\n");
-					return NF_ACCEPT;
-				}
-			} else {
-				if (iph->ttl < htons(63.5)){
-					printk(KERN_INFO "Step 6\n");
-					return NF_ACCEPT;
-				} else {
-					printk(KERN_INFO "Step 7 - DROP\n");
-					return NF_DROP;
-				}
-			}
-		} else {
-			if (iph->ttl < htons(254.5)){
-				printk(KERN_INFO "Step 8\n");
-				return NF_ACCEPT;
-			} else {
-				printk(KERN_INFO "Step 9 - DROP\n");
-				return NF_DROP;
-			}
-		}
-	} else {
-		//printk(KERN_INFO "Step 10\n");
-		return NF_ACCEPT;
-	}
-	
     }
 
     return NF_ACCEPT;
