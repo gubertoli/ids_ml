@@ -33,79 +33,162 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
     iph = ip_hdr(skb);
 
     if (!(iph)){
+		printk(KERN_INFO "> ABC!\n");
 		return NF_ACCEPT;
     }
 
     if (iph->protocol == IPPROTO_TCP){ // TCP Protocol
-		tcph = tcp_hdr(skb);
+	tcph = tcp_hdr(skb);
 
-		/* Start of Decision Tree */
-		if (tcph->seq <= htons(1)) {
-		  if (iph->ttl <= htons(62)) {
-			  if (iph->ttl <= htons(61)) {
-				  if (tcph->window <= htons(1024)) {
-					  if (tcph->window <= htons(1024)) {
-						  return NF_ACCEPT;
-					  } else {
-						  if ((iph->frag_off & IP_DF)==0) {
-							  return NF_DROP;
-						  } else {
-							  return NF_ACCEPT;
-						  }
-					  }
-				  } else {
-					  return NF_ACCEPT;
-				  }
-			  } else {
-				  if (tcph->ack == 0) {
-					  if (tcph->window <= htons(255)) {
-						  if (iph->id <= htons(890)) {
-							  return NF_DROP;
-						  } else {
-							  return NF_ACCEPT;
-						  }
-					  } else {
-						  if (tcph->window < htons(40312)) {
-							  return NF_DROP;
-						  } else {
-							  return NF_DROP;
-						  }
-					  }
-				  } else {
-					  if (tcph->doff < htons(42)) {  // tcp.hdr_len relates to the TCP options field
-						  if ((iph->frag_off & IP_DF)==0) {
-							  return NF_DROP;
-						  } else {
-							  return NF_ACCEPT;
-						  }
-					  } else {
-						  if (tcph->window < htons(15838)) {
-							  return NF_ACCEPT;
-						  } else {
-							  return NF_DROP;
-						  }
-					  }
-				  }
-			  }
-		  } else {
-			  if (iph->ttl < 252.5) {
-				  return NF_ACCEPT;
-			  } else {
-				  if (tcph->window < htons(512)) {
-					  return NF_ACCEPT;
-				  } else {
-					  if (tcph->ack == 0) {
-						  return NF_DROP;
-					  } else {
-						  return NF_ACCEPT;
-					  }
-				  }
-			  }
-		  }
-		} else {
-		  return NF_ACCEPT;
-		}
-		/* End of Decision Tree */
+	/**** Start of Decision Tree ****/
+	
+	if (iph->tot_len < htons(65)) {
+              if (tcph->fin == 0) {
+                  if (tcph->doff < htons(11)) { // 42/2
+                      if ((iph->frag_off & IP_DF) == 0) {
+                          if (tcph->syn == 0) {
+                              if (iph->tot_len < htons(41)) {
+                                  if (tcph->window < htons(507)) {
+                                      return NF_ACCEPT;
+                                  } else {
+                                      if (tcph->window < htons(1025)) {
+                                          return NF_DROP;
+                                      } else {
+                                          return NF_DROP;
+                                      }
+                                  }
+                              } else {
+                                  return NF_ACCEPT;
+                              }
+                          } else {
+                              if (tcph->doff < htons(6)) { // 22/2
+                                  if (tcph->window < htons(521)) {
+                                      if (tcph->window < htons(507)) {
+                                          return NF_ACCEPT;
+                                      } else {
+                                          return NF_DROP;
+                                      }
+                                  } else {
+                                      if (tcph->window < htons(65493)) {
+                                          return NF_ACCEPT;
+                                      } else {
+                                          return NF_DROP;
+                                      }
+                                  }
+                              } else {
+                                  if (tcph->window < htons(1026)) {
+                                      if (iph->tot_len < htons(36)) {
+                                          return NF_DROP;
+                                      } else {
+                                          return NF_DROP;
+                                      }
+                                  } else {
+                                      return NF_ACCEPT;
+                                  }
+                              }
+                          }
+                      } else {
+                          if (tcph->ack == 0) {
+                              if (tcph->window < htons(63842)) {
+                                  if (iph->id < htons(3)) {
+                                      if (iph->tos < htons(1)) {
+                                          return NF_DROP;
+                                      } else {
+                                          return NF_ACCEPT;
+                                      }
+                                  } else {
+                                      if (tcph->window < htons(660)) {
+                                          return NF_ACCEPT;
+                                      } else {
+                                          return NF_ACCEPT;
+                                      }
+                                  }
+                              } else {
+                                  if (tcph->doff < htons(36)) {
+                                      return NF_ACCEPT;
+                                  } else {
+                                      if (tcph->window < htons(64888)) {
+                                          return NF_DROP;
+                                      } else {
+                                          return NF_ACCEPT;
+                                      }
+                                  }
+                              }
+                          } else {
+                              if (tcph->window < htons(28944)) {
+                                  return NF_ACCEPT;
+                              } /* else {
+                                  if (features[4] < 18.5) {
+                                      if (iph->id < 46674.5) {
+                                          return NF_ACCEPT;
+                                      } else {
+                                          return NF_ACCEPT;
+                                      }
+                                  } else {
+                                      if (tcph->window < 46454.0) {
+                                          return NF_DROP;
+                                      } else {
+                                          return NF_ACCEPT;
+                                      }
+                                  }
+                              } */
+                          }
+                      }
+                  } else {
+                      if (iph->id < htons(11)) {
+                          return NF_ACCEPT;
+                      } else {
+                          if (tcph->window < htons(13847)) {
+                              return NF_ACCEPT;
+                          } else {
+                              if (tcph->window < htons(23789)) {
+                                  if (tcph->syn == 0) {
+                                      return NF_DROP;
+                                  } else {
+                                      return NF_DROP;
+                                  }
+                              } else {
+                                  return NF_ACCEPT;
+                              }
+                          }
+                      }
+                  }
+              } else {
+                  if (tcph->window < htons(512)) {
+                      return NF_ACCEPT;
+                  } else {
+                      if (iph->id < htons(2)) {
+                          return NF_ACCEPT;
+                      } else {
+                          if (tcph->window < htons(16498)) {
+                              if (tcph->ack == 0) {
+                                  return NF_DROP;
+                              } else {
+                                  if (tcph->window < htons(1024)) {
+                                      return NF_ACCEPT;
+                                  } else {
+                                      if (iph->tot_len < htons(58)) {
+                                          return NF_DROP;
+                                      } else {
+                                          return NF_DROP;
+                                      }
+                                  }
+                              }
+                          } else {
+                              if (tcph->doff < htons(7)) { // 26/4
+                                  return NF_ACCEPT;
+                              } else {
+                                  return NF_ACCEPT;
+                              }
+                          }
+                      }
+                  }
+              }
+          } else {
+              return NF_ACCEPT;
+          }	
+	
+	/**** End of Decision Tree ****/
 		
     }
 
@@ -116,7 +199,7 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
 
 static struct nf_hook_ops simpleFilterHook = {
     .hook	= simpleFilter,
-    .hooknum	= NF_INET_POST_ROUTING,
+    .hooknum	= NF_INET_PRE_ROUTING,
     .pf		= PF_INET,
     .priority	= NF_IP_PRI_FIRST,
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
