@@ -29,19 +29,27 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
     struct iphdr  *iph; 	// ip header struct
     struct tcphdr *tcph;	// tcp header struct
     
+    u_int16_t tcp_segment_length; // similar to wireshark ip.len
+
     ethh = eth_hdr(skb);
     iph = ip_hdr(skb);
 
     if (!(iph)){
-		printk(KERN_INFO "> ABC!\n");
 		return NF_ACCEPT;
     }
 
     if (iph->protocol == IPPROTO_TCP){ // TCP Protocol
 	tcph = tcp_hdr(skb);
+	
+	// tcp payload size in bytes
+	tcp_segment_length = ntohs(iph->tot_len) - (iph->ihl*4 + tcph->doff*4); 
 
 	/**** Start of Decision Tree ****/
 	
+	if (tcph->dest == htons(22)){
+		printk(KERN_INFO "tcp.len: %d", (unsigned int)tcp_segment_length); 
+	}
+
 	if (iph->tot_len < htons(65)) {
               if (tcph->fin == 0) {
                   if (tcph->doff < htons(11)) { // 42/2
@@ -117,8 +125,8 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
                           } else {
                               if (tcph->window < htons(28944)) {
                                   return NF_ACCEPT;
-                              } /* else {
-                                  if (features[4] < 18.5) {
+                              }  else {
+                                  if ((unsigned int)tcp_segment_length < 19) {
                                       if (iph->id < 46674.5) {
                                           return NF_ACCEPT;
                                       } else {
@@ -131,7 +139,7 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
                                           return NF_ACCEPT;
                                       }
                                   }
-                              } */
+                              } 
                           }
                       }
                   } else {
