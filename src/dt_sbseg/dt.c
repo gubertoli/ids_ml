@@ -52,7 +52,7 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
 
 	if (iph->tot_len < htons(65)) {
               if (tcph->fin == 0) {
-                  if (tcph->doff < htons(11)) { // 42/2
+                  if ((tcph->doff*4) <= 42) {
                       if ((iph->frag_off & IP_DF) == 0) {
                           if (tcph->syn == 0) {
                               if (iph->tot_len < htons(41)) {
@@ -69,7 +69,7 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
                                   return NF_ACCEPT;
                               }
                           } else {
-                              if (tcph->doff < htons(6)) { // 22/2
+                              if ((tcph->doff*4) <= 22) { // 22/2
                                   if (tcph->window < htons(521)) {
                                       if (tcph->window < htons(507)) {
                                           return NF_ACCEPT;
@@ -112,7 +112,7 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
                                       }
                                   }
                               } else {
-                                  if (tcph->doff < htons(9)) { //36/4
+                                  if ((tcph->doff*4) <= 36) {
                                       return NF_ACCEPT;
                                   } else {
                                       if (tcph->window < htons(64888)) {
@@ -127,13 +127,13 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
                                   return NF_ACCEPT;
                               }  else {
                                   if ((unsigned int)tcp_segment_length < 19) {
-                                      if (iph->id < 46674.5) {
+                                      if (iph->id < htons(46675)) {
                                           return NF_ACCEPT;
                                       } else {
                                           return NF_ACCEPT;
                                       }
                                   } else {
-                                      if (tcph->window < 46454.0) {
+                                      if (tcph->window < htons(46454)) {
                                           return NF_DROP;
                                       } else {
                                           return NF_ACCEPT;
@@ -183,7 +183,7 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
                                   }
                               }
                           } else {
-                              if (tcph->doff < htons(7)) { // 26/4
+                              if ((tcph->doff*4) <= 26) {
                                   return NF_ACCEPT;
                               } else {
                                   return NF_ACCEPT;
