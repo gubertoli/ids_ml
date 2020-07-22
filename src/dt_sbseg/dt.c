@@ -30,6 +30,7 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
     struct tcphdr *tcph;	// tcp header struct
     
     u_int16_t tcp_segment_length; // similar to wireshark ip.len
+    #u_int8_t flags;
 
     ethh = eth_hdr(skb);
     iph = ip_hdr(skb);
@@ -41,123 +42,269 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
     if (iph->protocol == IPPROTO_TCP){ // TCP Protocol
 	tcph = tcp_hdr(skb);
 	
+	//flags = ((u_int8_t *)tcph)[13];
+
 	// tcp payload size in bytes
 	tcp_segment_length = ntohs(iph->tot_len) - (iph->ihl*4 + tcph->doff*4); 
 
+	//if (tcph->dest == htons(22)){
+	//	printk(KERN_INFO "tcp.th_flags: %d", flags); 
+	//}
+
 	/**** Start of Decision Tree ****/
-	
-	if (tcph->dest == htons(22)){
-		printk(KERN_INFO "tcp.len: %d", (unsigned int)tcp_segment_length); 
-	}
 
 	if (iph->tot_len < htons(65)) {
-              if (tcph->fin == 0) {
-                  if ((tcph->doff*4) <= 42) {
-                      if ((iph->frag_off & IP_DF) == 0) {
-                          if (tcph->syn == 0) {
-                              if (iph->tot_len < htons(41)) {
-                                  if (tcph->window < htons(507)) {
-                                      return NF_ACCEPT;
-                                  } else {
-                                      if (tcph->window < htons(1025)) {
-                                          return NF_DROP;
+              if (tcph->fin == htons(0)) {
+                  if ((tcph->doff*4) < htons(42)) {
+                      if (tcph->source < htons(43521)) {
+                          if (tcph->window < htons(1201)) {
+                              if ((iph->frag_off & IP_DF) == 0) {
+                                  if (tcph->syn == htons(0)) {
+                                      if (tcph->window < htons(506)) {
+                                          return NF_ACCEPT;
                                       } else {
-                                          return NF_DROP;
+                                          if (tcph->source < htons(944)) {
+                                              return NF_ACCEPT;
+                                          } else {
+                                              if (tcph->window < htons(1025)) {
+                                                  return NF_DROP;
+                                              } else {
+                                                  return NF_DROP;
+                                              }
+                                          }
+                                      }
+                                  } else {
+                                      if (tcph->source < htons(40073)) {
+                                          if (tcph->source < htons(3409)) {
+                                              if (tcph->window < htons(768)) {
+                                                  return NF_DROP;
+                                              } else {
+                                                  return NF_ACCEPT;
+                                              }
+                                          } else {
+                                              if (tcph->source < htons(40058)) {
+                                                  return NF_ACCEPT;
+                                              } else {
+                                                  return NF_DROP;
+                                              }
+                                          }
+                                      } else {
+                                          return NF_ACCEPT;
                                       }
                                   }
                               } else {
-                                  return NF_ACCEPT;
+                                  if (iph->id < htons(33)) {
+                                      if (tcph->source < htons(28708)) {
+                                          if (tcph->source < htons(2006)) {
+                                              return NF_ACCEPT;
+                                          } else {
+                                              if (tcph->source < htons(4166)) {
+                                                  return NF_DROP;
+                                              } else {
+                                                  return NF_ACCEPT;
+                                              }
+                                          }
+                                      } else {
+                                          if (tcph->source < htons(33785)) {
+                                              return NF_DROP;
+                                          } else {
+                                              if (tcph->source < htons(40033)) {
+                                                  return NF_ACCEPT;
+                                              } else {
+                                                  return NF_ACCEPT;
+                                              }
+                                          }
+                                      }
+                                  } else {
+                                      if (tcph->ack == htons(0)) {
+                                          if (tcph->source < htons(23)) {
+                                              if (iph->id < htons(47896)) {
+                                                  return NF_DROP;
+                                              } else {
+                                                  return NF_ACCEPT;
+                                              }
+                                          } else {
+                                              return NF_ACCEPT;
+                                          }
+                                      } else {
+                                          return NF_ACCEPT;
+                                      }
+                                  }
                               }
                           } else {
-                              if ((tcph->doff*4) <= 22) { // 22/2
-                                  if (tcph->window < htons(521)) {
-                                      if (tcph->window < htons(507)) {
+                              if (tcph->window < htons(64240)) {
+                                  if ((unsigned int)tcp_segment_length < 19) {
+                                      if (iph->id < htons(50800)) {
                                           return NF_ACCEPT;
                                       } else {
-                                          return NF_DROP;
+                                          if (iph->id < htons(50818)) {
+                                              return NF_DROP;
+                                          } else {
+                                              return NF_ACCEPT;
+                                          }
                                       }
                                   } else {
-                                      if (tcph->window < htons(65493)) {
+                                      if (tcph->source < htons(16552)) {
                                           return NF_ACCEPT;
                                       } else {
                                           return NF_DROP;
                                       }
                                   }
                               } else {
-                                  if (tcph->window < htons(1026)) {
-                                      if (iph->tot_len < htons(36)) {
-                                          return NF_DROP;
-                                      } else {
-                                          return NF_DROP;
-                                      }
-                                  } else {
+                                  if (tcph->source < htons(32746)) {
                                       return NF_ACCEPT;
+                                  } else {
+                                      if (tcph->window < htons(64293)) {
+                                          if (iph->tot_len < htons(56)) {
+                                              return NF_ACCEPT;
+                                          } else {
+                                              if (iph->id < htons(55380)) {
+                                                  return NF_DROP;
+                                              } else {
+                                                  return NF_DROP;
+                                              }
+                                          }
+                                      } else {
+                                          if (tcph->source < htons(33613)) {
+                                              if (tcph->source < htons(33313)) {
+                                                  return NF_ACCEPT;
+                                              } else {
+                                                  return NF_DROP;
+                                              }
+                                          } else {
+                                              if (tcph->source < htons(41889)) {
+                                                  return NF_ACCEPT;
+                                              } else {
+                                                  return NF_DROP;
+                                              }
+                                          }
+                                      }
                                   }
                               }
                           }
                       } else {
-                          if (tcph->ack == 0) {
-                              if (tcph->window < htons(63842)) {
-                                  if (iph->id < htons(3)) {
-                                      if (iph->tos < htons(1)) {
-                                          return NF_DROP;
+                          if (tcph->source < htons(62217)) {
+                              if (tcph->window < htons(64233)) {
+                                  if (tcph->window < htons(1)) {
+                                      if (tcph->source < htons(61992)) {
+                                          if (tcph->source < htons(55780)) {
+                                              return NF_ACCEPT;
+                                          } else {
+                                              if (tcph->source < htons(55799)) {
+                                                  return NF_DROP;
+                                              } else {
+                                                  return NF_ACCEPT;
+                                              }
+                                          }
                                       } else {
-                                          return NF_ACCEPT;
+                                          return NF_DROP;
                                       }
                                   } else {
-                                      if (tcph->window < htons(660)) {
-                                          return NF_ACCEPT;
+                                      if ((unsigned int)tcp_segment_length < 18) {
+                                          if (tcph->window < htons(28946)) {
+                                              return NF_ACCEPT;
+                                          } else {
+                                              if (tcph->window < htons(29000)) {
+                                                  return NF_ACCEPT;
+                                              } else {
+                                                  return NF_ACCEPT;
+                                              }
+                                          }
                                       } else {
-                                          return NF_ACCEPT;
+                                          if (tcph->window < htons(16528)) {
+                                              return NF_ACCEPT;
+                                          } else {
+                                              return NF_DROP;
+                                          }
                                       }
                                   }
                               } else {
-                                  if ((tcph->doff*4) <= 36) {
-                                      return NF_ACCEPT;
+                                  if (iph->tot_len < htons(59)) {
+                                      if (tcph->source < htons(51418)) {
+                                          if (tcph->source < htons(49003)) {
+                                              return NF_ACCEPT;
+                                          } else {
+                                              if (iph->id < htons(54161)) {
+                                                  return NF_ACCEPT;
+                                              } else {
+                                                  return NF_DROP;
+                                              }
+                                          }
+                                      } else {
+                                          return NF_ACCEPT;
+                                      }
                                   } else {
-                                      if (tcph->window < htons(64888)) {
-                                          return NF_DROP;
+                                      if (tcph->window < htons(64520)) {
+                                          if (tcph->source < htons(49124)) {
+                                              return NF_DROP;
+                                          } else {
+                                              if (tcph->source < htons(49237)) {
+                                                  return NF_DROP;
+                                              } else {
+                                                  return NF_DROP;
+                                              }
+                                          }
                                       } else {
                                           return NF_ACCEPT;
                                       }
                                   }
                               }
                           } else {
-                              if (tcph->window < htons(28944)) {
-                                  return NF_ACCEPT;
-                              }  else {
-                                  if ((unsigned int)tcp_segment_length < 19) {
-                                      if (iph->id < htons(46675)) {
-                                          return NF_ACCEPT;
+                              if (tcph->window < htons(1025)) {
+                                  if ((iph->frag_off & IP_DF) == 0) {
+                                      if (tcph->source < htons(62237)) {
+                                          return NF_DROP;
                                       } else {
-                                          return NF_ACCEPT;
+                                          if (tcph->ack == htons(0)) {
+                                              return NF_ACCEPT;
+                                          } else {
+                                              if (tcph->window < htons(769)) {
+                                                  return NF_ACCEPT;
+                                              } else {
+                                                  return NF_DROP;
+                                              }
+                                          }
                                       }
                                   } else {
-                                      if (tcph->window < htons(46454)) {
-                                          return NF_DROP;
+                                      if (tcph->ack == htons(0)) {
+                                          if (tcph->source < htons(62330)) {
+                                              return NF_DROP;
+                                          } else {
+                                              if (tcph->source < htons(63851)) {
+                                                  return NF_ACCEPT;
+                                              } else {
+                                                  return NF_ACCEPT;
+                                              }
+                                          }
                                       } else {
                                           return NF_ACCEPT;
                                       }
                                   }
-                              } 
+                              } else {
+                                  if ((unsigned int)tcp_segment_length < 18) {
+                                      if (iph->id < htons(46559)) {
+                                          return NF_ACCEPT;
+                                      } else {
+                                          if (iph->id < htons(46771)) {
+                                              return NF_DROP;
+                                          } else {
+                                              return NF_ACCEPT;
+                                          }
+                                      }
+                                  } else {
+                                      return NF_DROP;
+                                  }
+                              }
                           }
                       }
                   } else {
-                      if (iph->id < htons(11)) {
+                      if (tcph->window < htons(15749)) {
                           return NF_ACCEPT;
                       } else {
-                          if (tcph->window < htons(13847)) {
-                              return NF_ACCEPT;
+                          if (tcph->window < htons(23789)) {
+                              return NF_DROP;
                           } else {
-                              if (tcph->window < htons(23789)) {
-                                  if (tcph->syn == 0) {
-                                      return NF_DROP;
-                                  } else {
-                                      return NF_DROP;
-                                  }
-                              } else {
-                                  return NF_ACCEPT;
-                              }
+                              return NF_ACCEPT;
                           }
                       }
                   }
@@ -165,26 +312,34 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
                   if (tcph->window < htons(512)) {
                       return NF_ACCEPT;
                   } else {
-                      if (iph->id < htons(2)) {
-                          return NF_ACCEPT;
+                      if (tcph->ack == htons(0)) {
+                          return NF_DROP;
                       } else {
-                          if (tcph->window < htons(16498)) {
-                              if (tcph->ack == 0) {
-                                  return NF_DROP;
-                              } else {
+                          if (iph->id < htons(19)) {
+                              return NF_ACCEPT;
+                          } else {
+                              if (tcph->window < htons(16498)) {
                                   if (tcph->window < htons(1024)) {
                                       return NF_ACCEPT;
                                   } else {
-                                      if (iph->tot_len < htons(58)) {
-                                          return NF_DROP;
+                                      if (tcph->source < htons(3152)) {
+                                          return NF_ACCEPT;
                                       } else {
-                                          return NF_DROP;
+                                          if (tcph->source < htons(39166)) {
+                                              if (tcph->source < htons(29318)) {
+                                                  return NF_DROP;
+                                              } else {
+                                                  return NF_DROP;
+                                              }
+                                          } else {
+                                              if (iph->tot_len < htons(58)) {
+                                                  return NF_ACCEPT;
+                                              } else {
+                                                  return NF_DROP;
+                                              }
+                                          }
                                       }
                                   }
-                              }
-                          } else {
-                              if ((tcph->doff*4) <= 26) {
-                                  return NF_ACCEPT;
                               } else {
                                   return NF_ACCEPT;
                               }
@@ -194,11 +349,10 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
               }
           } else {
               return NF_ACCEPT;
-          }	
+          }
+	}
 	
 	/**** End of Decision Tree ****/
-		
-    }
 
     return NF_ACCEPT;
 }
