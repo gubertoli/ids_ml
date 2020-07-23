@@ -5,4 +5,5 @@
 *.mod.c
 *.mod.o
 *.o
+*.swp
 modules.order
