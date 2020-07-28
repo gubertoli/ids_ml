@@ -2,12 +2,12 @@ with LKM (iperf)
 ----------------------------------------------------------------------------
 id	interval	transfer	bandwidth	retr
 ----------------------------------------------------------------------------
-4	0.00-1200	2.53 Gbytes	18.1 Mbits/s	55	sender
-4	0.00-1200	2.53 Gbytes	18.1 Mbits/2		receiver
+4	0.00-1200	4.70 Gbytes	33.7 Mbits/s	73	sender
+4	0.00-1200	4.70 Gbytes	33.7 Mbits/s		receiver
 
 without LKM (iperf)
 ----------------------------------------------------------------------------
 id	interval	transfer	bandwidth	retr
 ----------------------------------------------------------------------------
-4	0.00-1200	2.85 GBytes	20.4 Mbits/s	34	sender
-4	0.00-1200	2.85 GBytes	20.4 Mbits/s		receiver
+4	0.00-1200	4.86 GBytes	34.8 Mbits/s	74	sender
+4	0.00-1200	4.86 GBytes	34.8 Mbits/s		receiver
