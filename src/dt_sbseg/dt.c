@@ -53,199 +53,35 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
 
 	/**** Start of Decision Tree ****/
 	
-	if (iph->tot_len < htons(65)) {
+          if (iph->tot_len < htons(65)) {
               if (tcph->fin == 0) {
                   if ((tcph->doff*4) < htons(38)) {
                       if ((iph->frag_off & IP_DF) == 0) {
                           if (tcph->syn == 0) {
                               if (iph->tot_len < htons(41)) {
-                                  if (tcph->window < htons(507)) {
-                                      return NF_ACCEPT;
-                                  } else {
-                                      if (tcph->window < htons(1300)) {
-                                          if (tcph->window < htons(1025)) {
-                                              if (iph->id < htons(58935)) {
-                                                  if (iph->id < htons(20092)) {
-                                                      return NF_DROP;
-                                                  } else {
-                                                      return NF_DROP;
-                                                  }
-                                              } else {
-                                                  if (iph->id < htons(58937)) {
-                                                      return NF_ACCEPT;
-                                                  } else {
-                                                      return NF_DROP;
-                                                  }
-                                              }
-                                          } else {
-                                              if (tcph->rst == 0) {
-                                                  return NF_ACCEPT;
-                                              } else {
-                                                  if (iph->tos < htons(4)) {
-                                                      return NF_DROP;
-                                                  } else {
-                                                      return NF_ACCEPT;
-                                                  }
-                                              }
-                                          }
-                                      } else {
-                                          if (tcph->ack == 0) {
-                                              return NF_ACCEPT;
-                                          } else {
-                                              return NF_ACCEPT;
-                                          }
-                                      }
-                                  }
+                                  return NF_DROP;
                               } else {
-                                  if ((tcph->doff*4) < htons(26)) {
-                                      return NF_ACCEPT;
-                                  } else {
-                                      return NF_ACCEPT;
-                                  }
+                                  return NF_ACCEPT;
                               }
                           } else {
                               if (tcph->window < htons(521)) {
-                                  if (tcph->window < htons(507)) {
-                                      return NF_ACCEPT;
-                                  } else {
-                                      return NF_DROP;
-                                  }
+                                  return NF_DROP;
                               } else {
-                                  if (tcph->window < htons(65524)) {
-                                      if (iph->tot_len < htons(42)) {
-                                          if (tcph->window < htons(1065)) {
-                                              if (iph->tos < htons(2)) {
-                                                  if (iph->id < htons(60742)) {
-                                                      return NF_ACCEPT;
-                                                  } else {
-                                                      return NF_ACCEPT;
-                                                  }
-                                              } else {
-                                                  return NF_ACCEPT;
-                                              }
-                                          } else {
-                                              return NF_ACCEPT;
-                                          }
-                                      } else {
-                                          if (tcph->window < htons(1026)) {
-                                              if (iph->tos < htons(4)) {
-                                                  if (tcph->window < htons(933)) {
-                                                      return NF_ACCEPT;
-                                                  } else {
-                                                      return NF_DROP;
-                                                  }
-                                              } else {
-                                                  return NF_ACCEPT;
-                                              }
-                                          } else {
-                                              return NF_ACCEPT;
-                                          }
-                                      }
-                                  } else {
-                                      if (iph->tos < htons(4)) {
-                                          if ((tcph->doff*4) < htons(22)) {
-                                              return NF_DROP;
-                                          } else {
-                                              return NF_ACCEPT;
-                                          }
-                                      } else {
-                                          return NF_ACCEPT;
-                                      }
-                                  }
+                                  return NF_ACCEPT;
                               }
                           }
                       } else {
                           if (tcph->window < htons(1)) {
                               if (iph->id < htons(60)) {
-                                  if (tcph->ack == 0) {
-                                      if (iph->tos < htons(1)) {
-                                          return NF_DROP;
-                                      } else {
-                                          if (iph->tos < htons(5)) {
-                                              return NF_ACCEPT;
-                                          } else {
-                                              return NF_ACCEPT;
-                                          }
-                                      }
-                                  } else {
-                                      if (tcph->rst == 0) {
-                                          return NF_ACCEPT;
-                                      } else {
-                                          return NF_ACCEPT;
-                                      }
-                                  }
+                                  return NF_DROP;
                               } else {
-                                  if (iph->id < htons(38767)) {
-                                      return NF_ACCEPT;
-                                  } else {
-                                      if (iph->id < htons(38841)) {
-                                          return NF_DROP;
-                                      } else {
-                                          if (iph->id < htons(41467)) {
-                                              if (iph->id < htons(41284)) {
-                                                  return NF_ACCEPT;
-                                              } else {
-                                                  return NF_DROP;
-                                              }
-                                          } else {
-                                              if (iph->id < htons(60710)) {
-                                                  if (tcph->ack == 0) {
-                                                      return NF_ACCEPT;
-                                                  } else {
-                                                      return NF_ACCEPT;
-                                                  }
-                                              } else {
-                                                  if (iph->id < htons(60827)) {
-                                                      return NF_DROP;
-                                                  } else {
-                                                      return NF_ACCEPT;
-                                                  }
-                                              }
-                                          }
-                                      }
-                                  }
+                                  return NF_ACCEPT;
                               }
                           } else {
                               if ((unsigned int)tcp_segment_length < 19) {
-                                  if (tcph->window < htons(28944)) {
-                                      return NF_ACCEPT;
-                                  } else {
-                                      if (tcph->window < htons(29008)) {
-                                          if (iph->id < htons(26421)) {
-                                              return NF_ACCEPT;
-                                          } else {
-                                              return NF_DROP;
-                                          }
-                                      } else {
-                                          if (tcph->rst == 0) {
-                                              if (iph->id < htons(51143)) {
-                                                  return NF_ACCEPT;
-                                              } else {
-                                                  if (iph->id < htons(51161)) {
-                                                      return NF_DROP;
-                                                  } else {
-                                                      return NF_ACCEPT;
-                                                  }
-                                              }
-                                          } else {
-                                              if (iph->tot_len < htons(46)) {
-                                                  return NF_ACCEPT;
-                                              } else {
-                                                  return NF_DROP;
-                                              }
-                                          }
-                                      }
-                                  }
+                                  return NF_ACCEPT;
                               } else {
-                                  if (tcph->window < htons(21780)) {
-                                      return NF_ACCEPT;
-                                  } else {
-                                      if (tcph->window < htons(46454)) {
-                                          return NF_DROP;
-                                      } else {
-                                          return NF_ACCEPT;
-                                      }
-                                  }
+                                  return NF_ACCEPT;
                               }
                           }
                       }
@@ -257,34 +93,10 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
                               if (iph->id < htons(11)) {
                                   return NF_ACCEPT;
                               } else {
-                                  if (tcph->window < htons(16472)) {
-                                      if ((tcph->doff*4) < htons(42)) {
-                                          return NF_ACCEPT;
-                                      } else {
-                                          return NF_DROP;
-                                      }
-                                  } else {
-                                      if (tcph->window < htons(64157)) {
-                                          return NF_ACCEPT;
-                                      } else {
-                                          if (iph->id < htons(55527)) {
-                                              if (iph->id < htons(55380)) {
-                                                  if (iph->id < htons(50700)) {
-                                                      return NF_DROP;
-                                                  } else {
-                                                      return NF_DROP;
-                                                  }
-                                              } else {
-                                                  return NF_DROP;
-                                              }
-                                          } else {
-                                              return NF_DROP;
-                                          }
-                                      }
-                                  }
+                                  return NF_DROP;
                               }
                           } else {
-                              if ((iph->frag_off & IP_DF) == 0) {
+                              if (iph->tot_len < htons(62)) {
                                   return NF_ACCEPT;
                               } else {
                                   return NF_ACCEPT;
@@ -301,31 +113,7 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
                       } else {
                           if (tcph->window < htons(16498)) {
                               if (iph->tos < htons(4)) {
-                                  if (tcph->ack == 0) {
-                                      if (tcph->psh == 0) {
-                                          return NF_DROP;
-                                      } else {
-                                          return NF_DROP;
-                                      }
-                                  } else {
-                                      if (tcph->window < htons(1024)) {
-                                          return NF_ACCEPT;
-                                      } else {
-                                          if (tcph->window < htons(15616)) {
-                                              if (tcph->window < htons(1025)) {
-                                                  if ((iph->frag_off & IP_DF) == 0) {
-                                                      return NF_DROP;
-                                                  } else {
-                                                      return NF_ACCEPT;
-                                                  }
-                                              } else {
-                                                  return NF_ACCEPT;
-                                              }
-                                          } else {
-                                              return NF_DROP;
-                                          }
-                                      }
-                                  }
+                                  return NF_DROP;
                               } else {
                                   return NF_ACCEPT;
                               }
@@ -336,15 +124,14 @@ static unsigned int simpleFilter(void *priv, struct sk_buff *skb, const struct n
                   }
               }
           } else {
-              if (iph->id < htons(1)) {
+              if (iph->tot_len < htons(66)) {
                   return NF_ACCEPT;
               } else {
                   return NF_ACCEPT;
               }
           }
-	}
 	/**** End of Decision Tree ****/
-
+	}
     return NF_ACCEPT;
 }
 
